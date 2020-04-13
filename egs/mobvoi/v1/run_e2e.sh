@@ -1,4 +1,10 @@
 #!/bin/bash
+# Copyright 2018-2020  Daniel Povey
+#           2018-2020  Yiming Wang
+
+# This recipe uses E2E LF-MMI training which doesn't require GMM training to obtain alignments.
+# Its performance is slightly better than those based on alignments (cross-entropy or regular LF-MMI)
+# on this dataset.
 
 stage=0
 
@@ -60,7 +66,9 @@ fi
 if [ $stage -le 6 ]; then
   id_sil=`cat data/lang/words.txt | grep "<sil>" | awk '{print $2}'`
   id_freetext=`cat data/lang/words.txt | grep "FREETEXT" | awk '{print $2}'`
+  export LC_ALL=en_US.UTF-8
   id_word=`cat data/lang/words.txt | grep "嗨小问" | awk '{print $2}'`
+  export LC_ALL=C
   mkdir -p data/lang/lm
   cat <<EOF > data/lang/lm/fst.txt
 0 1 $id_sil $id_sil
@@ -142,7 +150,7 @@ if [ $stage -le 8 ]; then
   done
 
   # Augment with musan_noise
-  export LC_ALL=en_US.UTF-8 
+  export LC_ALL=en_US.UTF-8
   steps/data/augment_data_dir_for_asr.py --utt-prefix "noise" --fg-interval 1 --fg-snrs "15:10:5:0" --fg-noise-dir "data/musan_noise" data/train_shorter data/train_shorter_noise
   cat data/train_shorter/utt2dur | awk -v name=noise '{print name"_"$0}' >data/train_shorter_noise/utt2dur
   # Augment with musan_music

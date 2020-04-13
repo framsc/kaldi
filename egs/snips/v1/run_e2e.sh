@@ -1,4 +1,10 @@
 #!/bin/bash
+# Copyright 2018-2020  Daniel Povey
+#           2018-2020  Yiming Wang
+
+# This recipe uses E2E LF-MMI training which doesn't require GMM training to obtain alignments.
+# Its performance is slightly better than those based on alignments (cross-entropy or regular LF-MMI)
+# on this dataset.
 
 stage=0
 

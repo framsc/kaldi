@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright 2018-2020  Daniel Povey
+#           2018-2020  Yiming Wang
 
 stage=0
 
@@ -44,8 +46,7 @@ if [ $stage -le 4 ]; then
   for folder in train dev eval; do
     dir=data/$folder
     cat $dir/text | awk '{if ($2=="嗨小问" || $2=="嗨小问嗨小问") {print $1,"嗨小问";} else {print $1,"FREETEXT"}}' > $dir/text.tmp || exit 1
-    cat $dir/text.tmp > $dir/text || exit 1
-    rm -f $dir/text.tmp 2>/dev/null || true
+    mv $dir/text.tmp $dir/text || exit 1
   done
 fi
 
@@ -60,7 +61,9 @@ fi
 if [ $stage -le 6 ]; then
   id_sil=`cat data/lang/words.txt | grep "<sil>" | awk '{print $2}'`
   id_freetext=`cat data/lang/words.txt | grep "FREETEXT" | awk '{print $2}'`
+  export LC_ALL=en_US.UTF-8
   id_word=`cat data/lang/words.txt | grep "嗨小问" | awk '{print $2}'`
+  export LC_ALL=C
   mkdir -p data/lang/lm
   cat <<EOF > data/lang/lm/fst.txt
 0 1 $id_sil $id_sil
